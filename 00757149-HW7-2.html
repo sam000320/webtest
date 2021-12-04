@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Local Storage</title>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <style type="text/CSS">
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            background-color: lightblue;
+            font-family: Perpetua;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+            padding: 4px;
+        }
+
+        th {
+            text-align: center;
+            color: white;
+            background-color: darkblue;
+        }
+
+        tr.oddrow {
+            background-color: white;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        let title, author, bookYear, bookURL, div_display;
+        function start() {
+            title = document.getElementById('title');
+            author = document.getElementById('author');
+            bookYear = document.getElementById('bookYear');
+            bookURL = document.getElementById('bookURL');
+            div_display = document.getElementById("display");
+            document.getElementById('addButton').addEventListener("click", add1, false);
+            document.getElementById('removeAllButton').addEventListener("click", removeAll, false);
+            display_add();
+        }
+        function display_add() {
+            let length = localStorage.length;
+            let tagArr = new Array();
+            for (var i = 0; i < length; i++) {
+                if (localStorage.key(i).startsWith("ntou")) tagArr.push(localStorage.key(i));
+            }
+            tagArr.sort();
+
+            let content = "<table>" + "<thead><tr><th>Title</th><th>Author</th><th>Year</th><th>URL</th></thead>" + "<tbody>";
+            for (var tag of tagArr) {
+                let obj = JSON.parse(localStorage.getItem(tag));
+                content += "<tr'><td>" + obj.title + "</td><td>" + obj.author + "</td><td>" + obj.bookYear + "</td><td><a href=\"" + obj.bookURL + "\" target='blank'>" + obj.bookURL + "</a></td></tr>"
+            }
+            content += "</tbody>" + "</table>";
+            div_display.innerHTML = content;
+        }
+        function add1() {
+            let key = "ntou-" + new Date().valueOf();
+            let obj = {
+                "title": title.value,
+                "author": author.value,
+                "bookYear": bookYear.value,
+                "bookURL": bookURL.value
+            }
+            localStorage.setItem(key, JSON.stringify(obj));
+            title.value="";
+            author.value="";
+            bookYear.value="";
+            bookURL.value="";
+            display_add();
+        }
+        function removeAll() {
+            let tagArr = new Array();
+            for (let i = 0; i < localStorage.length; i++) {
+                tagArr.push(localStorage.key(i));
+            }
+            for (let index of tagArr) {
+                console.log("deleting...");
+                if (index.startsWith("ntou")) {
+                    localStorage.removeItem(index);
+                }
+            }
+            display_add();
+            swal("All items were removed!","","info");
+        }
+        window.addEventListener("load", start, false);
+    </script>
+</head>
+
+<body>
+    <a href="">GitHub Link</a>
+    <form action="#">
+        <p>
+            <label>Book Title:
+                <input type="text" id="title">
+            </label>
+            <label>Author(s):
+                <input type="text" id="author">
+            </label>
+            <label>Year:
+                <input type="number" id="bookYear">
+            </label>
+            <label>Book URL:
+                <input type="url" id="bookURL">
+            </label>
+        </p>
+        <p>
+            <input type="button" value="Add New Item" id="addButton">
+            <input type="button" value="Remove All Items" id="removeAllButton">
+        </p>
+    </form>
+    <hr>
+    <div id="display">
+    </div>
+</body>
+
+</html>
